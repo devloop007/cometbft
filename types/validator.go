@@ -19,7 +19,7 @@ type Validator struct {
 	Address     Address       `json:"address"`
 	PubKey      crypto.PubKey `json:"pub_key"`
 	VotingPower int64         `json:"voting_power"`
-	IsCore int64 	          `json:"is_core"`
+	IsCore      bool          `json:"is_core"`
 
 	ProposerPriority int64 `json:"proposer_priority"`
 }
