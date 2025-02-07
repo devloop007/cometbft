@@ -19,18 +19,27 @@ type Validator struct {
 	Address     Address       `json:"address"`
 	PubKey      crypto.PubKey `json:"pub_key"`
 	VotingPower int64         `json:"voting_power"`
-	IsCore      bool          `json:"is_core"`
 
 	ProposerPriority int64 `json:"proposer_priority"`
+
+	IsCore bool `json:"is_core"`
 }
 
 // NewValidator returns a new validator with the given pubkey and voting power.
-func NewValidator(pubKey crypto.PubKey, votingPower int64) *Validator {
+func NewValidator(pubKey crypto.PubKey, votingPower int64, options ...bool) *Validator {
+
+	isCore := false // Default value
+
+	if len(options) > 0 {
+		isCore = options[0]
+	}
+
 	return &Validator{
 		Address:          pubKey.Address(),
 		PubKey:           pubKey,
 		VotingPower:      votingPower,
 		ProposerPriority: 0,
+		IsCore:           isCore,
 	}
 }
 
@@ -94,11 +103,12 @@ func (v *Validator) String() string {
 	if v == nil {
 		return "nil-Validator"
 	}
-	return fmt.Sprintf("Validator{%v %v VP:%v A:%v}",
+	return fmt.Sprintf("Validator{%v %v VP:%v A:%v C:%v}",
 		v.Address,
 		v.PubKey,
 		v.VotingPower,
-		v.ProposerPriority)
+		v.ProposerPriority,
+		v.IsCore)
 }
 
 // ValidatorListString returns a prettified validator list for logging purposes.
@@ -149,6 +159,7 @@ func (v *Validator) ToProto() (*cmtproto.Validator, error) {
 		PubKey:           pk,
 		VotingPower:      v.VotingPower,
 		ProposerPriority: v.ProposerPriority,
+		IsCore:           v.IsCore,
 	}
 
 	return &vp, nil
@@ -170,6 +181,7 @@ func ValidatorFromProto(vp *cmtproto.Validator) (*Validator, error) {
 	v.PubKey = pk
 	v.VotingPower = vp.GetVotingPower()
 	v.ProposerPriority = vp.GetProposerPriority()
+	v.IsCore = vp.GetIsCore()
 
 	return v, nil
 }
